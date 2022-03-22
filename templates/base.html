@@ -28,16 +28,35 @@
               </ul>
 
               <div class="col-md-3 text-end">
-                <button type="button" class="btn btn-outline-primary me-2">Войти</button>
-                <button type="button" class="btn btn-primary">Регистрация</button>
+                {% if current_user.is_authenticated %}
+                    <div class="dropdown">
+                      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                          {{ current_user.name }}
+                      </button>
+
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="/profile">Профиль</a></li>
+                        <li><a class="dropdown-item" href="/logout">Выйти</a></li>
+                      </ul>
+                    </div>
+                    <!-- <a class="navbar-brand" href="/logout">{{ current_user.name }}</a> -->
+                {% else %}
+                    <p>
+                <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
+                <a class="btn btn-success" href="/login">Войти</a>
+                    </p>
+                {% endif %}
               </div>
             </header>
           </div>
 
 
         <!-- Begin page content -->
+        <div class="container">
         {% block content %}
+
         {% endblock %}
+        </div>
         <!-- End page content -->
 
         <div class="container">
