@@ -4,13 +4,20 @@
 
 <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
-        <img src="/static/image/profile.png" class="d-block mx-lg-auto img-fluid" alt="Profile" width="500" height="500" loading="lazy">
+        <img src="{{ avatar }}" class="d-block mx-lg-auto img-fluid" alt="Profile" width="500" height="500" loading="lazy">
       </div>
       <div class="col-lg-6">
         <h1 class="display-5 fw-bold lh-1 mb-3">{{name}}</h1>
         <p class="lead">{{about}}</p>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-          <button type="button" class="btn btn-primary btn-lg px-4 me-md-2">Изменить</button>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            Изменить
+          </button>
+
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <li><a class="dropdown-item" href="/profile/editing">Описание</a></li>
+            <li><a class="dropdown-item" href="/profile/editing/avatar">Аватар</a></li>
+          </ul>
         </div>
       </div>
     </div>

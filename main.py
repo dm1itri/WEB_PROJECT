@@ -1,15 +1,19 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.utils import secure_filename
 from additional_functions import parse_news
 from data import db_session
 from data.users import User
 from forms.user import RegisterForm, LoginForm
-
+from forms.profile_editing import ProfileForm
+from os import path
 
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['UPLOAD_FOLDER'] = '/static/image/profile'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
 
 @app.route('/')
@@ -132,7 +136,8 @@ def reqister():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            about=form.about.data
+            about=form.about.data,
+            avatar='/static/image/profile/profile.png'
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -159,16 +164,54 @@ def login():
 def profile():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
-    return render_template('profile.html', title='Профиль', name=user.name, about=user.about)
+    return render_template('profile.html', title='Профиль', name=user.name, about=user.about, avatar=user.avatar)
 
 
-@app.route('/profile/editing')
+@app.route('/profile/editing', methods=['GET', 'POST'])
 @login_required
-def profile():
+def profile_editing():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
-    print(user)
-    return render_template('profile_editing.html', title='Редактирование профиля', name=user.name, about=user.about)
+    form = ProfileForm()
+    if form.validate_on_submit():
+        data = request.form.to_dict()
+        if data['name']:
+            user.name = data['name']
+        if data['password']:
+            user.set_password(data['password'])
+        if data['about']:
+            user.about = data['about']
+        """
+        print(secure_filename(form.avatar.file.filename))
+        filename = secure_filename(form.avatar.file.filename)
+        file_path = path.join(app.config['UPLOAD_FOLDER'], filename)
+        form.avatar.file.save(file_path)
+        print('!!!!')
+        my_file = open(f'static/image/profile/profile_{user.email.replace(".", "_")}.png', 'wb+')
+        print('!')
+        print(request.files)
+        my_file.write(request.files['image'].read())
+        my_file.close()
+        user.image = f'/static/image/profile/profile_{user.email.replace(".", "_")}.png'"""
+        db_sess.commit()
+        return redirect('/profile')
+    return render_template('profile_editing.html', name=user.name, about=user.about, form=form, title='Редактирование профиля')
+
+
+@app.route('/profile/editing/avatar', methods=['GET', 'POST'])
+@login_required
+def profile_editing_avatar():
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == current_user.id).first()
+    if request.method == 'POST':
+        my_file = open(f'static/image/profile/profile_{user.email.replace(".", "_")}.png', 'wb+')
+        my_file.write(request.files['file'].read())
+        my_file.close()
+        user.avatar = f'/static/image/profile/profile_{user.email.replace(".", "_")}.png'
+        db_sess.commit()
+        return redirect('/profile')
+    avatar = user.avatar
+    return render_template('profile_editing_avatar.html', avatar=avatar)
 
 
 if __name__ == '__main__':
