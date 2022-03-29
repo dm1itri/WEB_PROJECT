@@ -3,7 +3,6 @@ import sqlalchemy
 from flask_login import UserMixin
 from sqlalchemy import orm
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from .db_session import SqlAlchemyBase
 
 
@@ -16,6 +15,7 @@ class User(SqlAlchemyBase, UserMixin):
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     avatar = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    programming_languages = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
     #news = orm.relation("News", back_populates='user')

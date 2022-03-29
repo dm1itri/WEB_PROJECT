@@ -9,6 +9,15 @@
       <div class="col-lg-6">
         <h1 class="display-5 fw-bold lh-1 mb-3">{{name}}</h1>
         <p class="lead">{{about}}</p>
+          {% if languages %}
+          <br>
+          <p class="lead">Изучаемые языки программирования</p>
+          <ul>
+            {% for language in languages %}
+                <li class="lead"><a href='/languages/{{language}}'>{{language | replace('_', ' ') | capitalize}}</a></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
         <div class="d-grid gap-2 d-md-flex justify-content-md-start dropdown">
           <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
             Изменить

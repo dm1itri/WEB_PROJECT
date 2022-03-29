@@ -77,7 +77,7 @@ def tests_1(name):
     return name_pages[name]
 
 
-@app.route('/languages/<name>')
+@app.route('/languages/<name>', methods=['GET', 'POST'])
 def languages(name):
     args_pages = {
         'python': ('Python — это высокоуровневый язык программирования, который используется в различных сферах IT, '
@@ -106,7 +106,16 @@ def languages(name):
                'Это модификация фундаментального языка С от компании Microsoft, призванная создать наиболее универсальное средство для разработки программного обеспечения для большого количества устройств и операционных систем. '
                'Язык C# практически универсален. Можно использовать его для создания любого ПО: продвинутых бизнес-приложений, видеоигр, функциональных веб-приложений, приложений для Windows, macOS, мобильных программ для iOS и Android.', 'c_sharp.png')
     }
-    return render_template('languages.html', title=name.replace('_', ' ').title(), language=name.replace('_', ' ').title(), about=args_pages[name][0], image=args_pages[name][1])
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == current_user.id).first()
+    if request.method == 'POST':
+        if name in str(user.programming_languages):
+            user.programming_languages = user.programming_languages.replace(f'{name} ', '')
+        else:
+            user.programming_languages = user.programming_languages + name + ' '
+        db_sess.commit()
+    add_language = False if name in str(user.programming_languages) else True
+    return render_template('languages.html', title=name.replace('_', ' ').title(), language=name.replace('_', ' ').title(), about=args_pages[name][0], image=args_pages[name][1], add_language=add_language)
 
 
 @login_manager.user_loader
@@ -137,7 +146,8 @@ def reqister():
             name=form.name.data,
             email=form.email.data,
             about=form.about.data,
-            avatar='/static/image/profile/profile.png'
+            avatar='/static/image/profile/profile.png',
+            programming_languages=''
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -164,7 +174,8 @@ def login():
 def profile():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
-    return render_template('profile.html', title='Профиль', name=user.name, about=user.about, avatar=user.avatar)
+    languages = user.programming_languages[1:-1].split(' ') if user.programming_languages else False
+    return render_template('profile.html', title='Профиль', name=user.name, about=user.about, avatar=user.avatar, languages=languages)
 
 
 @app.route('/profile/editing', methods=['GET', 'POST'])
