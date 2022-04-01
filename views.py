@@ -1,8 +1,20 @@
 from flask_admin.contrib.sqla import ModelView
 from wtforms.validators import DataRequired, Length
+from flask_login import current_user
+from flask import redirect, render_template
+from flask_admin import AdminIndexView
 
 
 class UserViews(ModelView):
+    def _handle_view(self, name, **kwargs):
+        if not self.is_accessible():
+            return redirect('/')
+
+    def is_accessible(self):
+        return (current_user.is_active and
+                current_user.is_authenticated and
+                current_user.admin == 'Администратор')
+
     can_export = True
     can_edit = True
     can_create = False
@@ -25,9 +37,12 @@ class UserViews(ModelView):
     }
     form_args = {
         'email': dict(label='Почта', validators=[DataRequired()]),
-        'password': dict(label='Пароль', validators=[DataRequired(), Length(min=4, max=16, message='Длина пароля должны быть от 4 до 16 символов')]),
-        'name': dict(label='Имя пользователя', validators=[DataRequired(), Length(max=64, message='Длина вашего имени не должна превышать 64 символов')]),
-        'about': dict(label="Немного о себе", validators=[Length(max=256, message='Длина описания не должна превышать 256 символов')])
+        'password': dict(label='Пароль', validators=[DataRequired(), Length(min=4, max=16,
+                                                                            message='Длина пароля должны быть от 4 до 16 символов')]),
+        'name': dict(label='Имя пользователя', validators=[DataRequired(), Length(max=64,
+                                                                                  message='Длина вашего имени не должна превышать 64 символов')]),
+        'about': dict(label="Немного о себе", validators=[
+            Length(max=256, message='Длина описания не должна превышать 256 символов')])
     }
 
     AVAILABLE_USER_TYPES = [
@@ -42,3 +57,6 @@ class UserViews(ModelView):
 
     create_modal = True
     edit_modal = True
+
+
+

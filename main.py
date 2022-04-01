@@ -1,12 +1,15 @@
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, url_for, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_admin import Admin, AdminIndexView, expose
+from flask_admin.menu import MenuLink
 from additional_functions import parse_news
 from data import db_session
 from data.users import User
 from forms.user import RegisterForm, LoginForm
 from forms.profile_editing import ProfileForm
 from views import UserViews
+from flask_babelex import Babel
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -20,7 +23,17 @@ login_manager.init_app(app)
 
 db_session.global_init("db/users.sqlite")
 db_sess = db_session.create_session()
+babel = Babel(app)
 
+
+@babel.localeselector
+def get_locale():
+    override = request.args.get('lang')
+
+    if override:
+        session['lang'] = override
+
+    return session.get('lang', 'ru')
 '''
 class MyAdminIndexView(AdminIndexView):
 
@@ -34,7 +47,7 @@ class MyAdminIndexView(AdminIndexView):
 '''
 
 # admin = Admin(app, index_view=MyAdminIndexView(), name='Подготовка к Техническому классу (админка)', template_mode='bootstrap4')
-admin = Admin(app, name='Подготовка к Техническому классу (админка)', template_mode='bootstrap4')
+admin = Admin(app, name='Кабинет Администратора', template_mode='bootstrap4')
 admin.add_view(UserViews(User, db_sess, name='Пользователи'))
 
 
@@ -54,7 +67,6 @@ def technical_class():
 
 @app.get('/news')
 def news():
-
     return render_template('news.html', title='Новости IT', news=parse_news())
 
 
