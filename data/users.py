@@ -1,5 +1,5 @@
-import datetime
-import sqlalchemy
+from datetime import datetime
+from sqlalchemy import Integer, Column, String, Boolean, DateTime
 from flask_login import UserMixin
 from sqlalchemy import orm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -9,14 +9,15 @@ from .db_session import SqlAlchemyBase
 class User(SqlAlchemyBase, UserMixin):
     __tablename__ = 'users'
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True)
-    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    avatar = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    programming_languages = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=True)
+    about = Column(String, nullable=True)
+    email = Column(String, index=True, unique=True, nullable=True)
+    hashed_password = Column(String, nullable=True)
+    avatar = Column(String, nullable=True, default='/static/image/profile/profile.png')
+    programming_languages = Column(String, default='')
+    created_date = Column(DateTime, default=datetime.now)
+    admin = Column(String, default='Пользователь', nullable=True)
 
     #news = orm.relation("News", back_populates='user')
 

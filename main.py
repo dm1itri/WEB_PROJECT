@@ -1,19 +1,41 @@
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.utils import secure_filename
+from flask_admin import Admin, AdminIndexView, expose
 from additional_functions import parse_news
 from data import db_session
 from data.users import User
 from forms.user import RegisterForm, LoginForm
 from forms.profile_editing import ProfileForm
-from os import path
+from views import UserViews
 
 app = Flask(__name__)
-login_manager = LoginManager()
-login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = '/static/image/profile'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
+#app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+db_session.global_init("db/users.sqlite")
+db_sess = db_session.create_session()
+
+'''
+class MyAdminIndexView(AdminIndexView):
+
+    @expose('/')
+    def index(self):
+        if not current_user.is_authenticated:
+            return redirect('/login')
+        if current_user.email not in ['d.ilin@gym.271.spb.ru']:
+            return redirect('/')
+        return super(MyAdminIndexView, self).index()
+'''
+
+# admin = Admin(app, index_view=MyAdminIndexView(), name='Подготовка к Техническому классу (админка)', template_mode='bootstrap4')
+admin = Admin(app, name='Подготовка к Техническому классу (админка)', template_mode='bootstrap4')
+admin.add_view(UserViews(User, db_sess, name='Пользователи'))
 
 
 @app.route('/')
@@ -21,7 +43,7 @@ def index():
     return render_template('base.html')
 
 
-@app.route('/technical_class')
+@app.get('/technical_class')
 def technical_class():
     # Расписание
     # Замены
@@ -30,23 +52,23 @@ def technical_class():
     pass
 
 
-@app.route('/news')
+@app.get('/news')
 def news():
 
     return render_template('news.html', title='Новости IT', news=parse_news())
 
 
-@app.route('/competitions')
+@app.get('/competitions')
 def competitions():
     return render_template('competitions.html', title='Олимпиады')
 
 
-@app.route('/tests')
+@app.get('/tests')
 def tests():
     return render_template('tests.html', title='Тесты')
 
 
-@app.route('/tests/1/<name>')
+@app.get('/tests/1/<name>')
 def tests_1(name):
     args_pages = {
         'Какой_ЯП_твой': [('/languages/python', 'обработка_данных.png', 'Обработка данных'),
@@ -125,7 +147,7 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-@app.route('/logout')
+@app.get('/logout')
 @login_required
 def logout():
     logout_user()
@@ -147,8 +169,6 @@ def reqister():
             name=form.name.data,
             email=form.email.data,
             about=form.about.data,
-            avatar='/static/image/profile/profile.png',
-            programming_languages=''
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -170,13 +190,13 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route('/profile')
+@app.get('/profile')
 @login_required
 def profile():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
     languages = user.programming_languages[1:-1].split(' ') if user.programming_languages else False
-    return render_template('profile.html', title='Профиль', name=user.name, about=user.about, avatar=user.avatar, languages=languages)
+    return render_template('profile.html', title='Профиль', name=user.name, about=user.about, avatar=user.avatar, languages=languages, admin=user.admin)
 
 
 @app.route('/profile/editing', methods=['GET', 'POST'])
@@ -193,18 +213,6 @@ def profile_editing():
             user.set_password(data['password'])
         if data['about']:
             user.about = data['about']
-        """
-        print(secure_filename(form.avatar.file.filename))
-        filename = secure_filename(form.avatar.file.filename)
-        file_path = path.join(app.config['UPLOAD_FOLDER'], filename)
-        form.avatar.file.save(file_path)
-        print('!!!!')
-        my_file = open(f'static/image/profile/profile_{user.email.replace(".", "_")}.png', 'wb+')
-        print('!')
-        print(request.files)
-        my_file.write(request.files['image'].read())
-        my_file.close()
-        user.image = f'/static/image/profile/profile_{user.email.replace(".", "_")}.png'"""
         db_sess.commit()
         return redirect('/profile')
     return render_template('profile_editing.html', name=user.name, about=user.about, form=form, title='Редактирование профиля')
@@ -226,6 +234,12 @@ def profile_editing_avatar():
     return render_template('profile_editing_avatar.html', avatar=avatar)
 
 
+@app.route('/admin_panel', methods=['GET', 'POST'])
+@login_required
+def admin_panel():
+    pass
+
+
 if __name__ == '__main__':
-    db_session.global_init("db/users.sqlite")
+
     app.run(port=8080, host='127.0.0.1')

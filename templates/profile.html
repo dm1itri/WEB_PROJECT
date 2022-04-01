@@ -28,6 +28,13 @@
             <li><a class="dropdown-item" href="/profile/editing/avatar">Аватар</a></li>
           </ul>
         </div>
+          
+          {% if admin == 'Администратор'%}
+          <br>
+          <br>
+          <br>
+          <a class="btn btn-warning" href="/admin">Панель Администратора</a>
+          {% endif %}
       </div>
     </div>
 
