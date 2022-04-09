@@ -1,8 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_admin import Admin, AdminIndexView, expose
-from flask_admin.menu import MenuLink
-from additional_functions import parse_news
 from data import db_session
 from data.users import User
 from forms.user import RegisterForm, LoginForm
@@ -44,9 +42,12 @@ class MyAdminIndexView(AdminIndexView):
         if current_user.email not in ['d.ilin@gym.271.spb.ru']:
             return redirect('/')
         return super(MyAdminIndexView, self).index()
+
+
+admin = Admin(app, index_view=MyAdminIndexView(), name='Подготовка к Техническому классу (админка)', template_mode='bootstrap4')
 '''
 
-# admin = Admin(app, index_view=MyAdminIndexView(), name='Подготовка к Техническому классу (админка)', template_mode='bootstrap4')
+
 admin = Admin(app, name='Кабинет Администратора', template_mode='bootstrap4')
 admin.add_view(UserViews(User, db_sess, name='Пользователи'))
 
@@ -65,14 +66,23 @@ def technical_class():
     pass
 
 
+'''
 @app.get('/news')
 def news():
     return render_template('news.html', title='Новости IT', news=parse_news())
 
+'''
 
-@app.get('/competitions')
-def competitions():
-    return render_template('competitions.html', title='Олимпиады')
+
+@app.get('/olympiads')
+def olympiads():
+    olympiads_list = [('Астрономия', '21-22 апреля', 'https://siriusolymp.ru/astronomy', 'astronomy.png'),
+                      ('Химия', '28-29 апреля', 'https://siriusolymp.ru/chemistry', 'chemistry.png'),
+                      ('Математика', '11-13 мая', 'https://siriusolymp.ru/mathematics', 'mathematics.png'),
+                      ('Физика', '16-17 мая', 'https://siriusolymp.ru/physics', 'physics.png'),
+                      ('Биология', '18-20 мая', 'https://siriusolymp.ru/biology', 'biology.png'),
+                      ('Информатика', '26-27 мая', 'https://siriusolymp.ru/informatics', 'informatics.png')]
+    return render_template('olympiads.html', title='Уголок Олимпиадника', olympiads=olympiads_list)
 
 
 @app.get('/tests')
