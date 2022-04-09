@@ -13,14 +13,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = '/static/image/profile'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
-#app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
 
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 db_session.global_init("db/users.sqlite")
-db_sess = db_session.create_session()
 babel = Babel(app)
 
 
@@ -49,12 +47,18 @@ admin = Admin(app, index_view=MyAdminIndexView(), name='Подготовка к 
 
 
 admin = Admin(app, name='Кабинет Администратора', template_mode='bootstrap4')
-admin.add_view(UserViews(User, db_sess, name='Пользователи'))
+admin.add_view(UserViews(User, db_session.create_session(), name='Пользователи'))
 
 
 @app.route('/')
-def index():
-    return render_template('base.html')
+def main_page():
+    lang = ""
+    button = True
+    if current_user.__class__.__name__ != 'AnonymousUserMixin':
+        db_sess = db_session.create_session()
+        lang = db_sess.query(User).filter(User.id == current_user.id).first().programming_languages.split(' ')[0]
+        button = False
+    return render_template('main.html', programming_lang=lang, button=button)
 
 
 @app.get('/technical_class')
