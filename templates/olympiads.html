@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-    {% for name, date, href, image in olympiads %}
+    {% for olympiad in olympiads %}
       <div class="feature col">
-        <img src="/static/image/olympiads/{{image}}" alt="">
-        <h2>{{name}}</h2>
-        <h4>{{date}}</h4>
-        <a href="{{href}}" class="btn btn-primary" style="color: #ffffff">
+        <img src="/static/image/olympiads/{{olympiad.image}}" alt="">
+        <h2>{{olympiad.type}}</h2>
+        <h4>{{olympiad.date}}</h4>
+        <a href="{{olympiad.href}}" class="btn btn-primary" style="color: #ffffff">
           Регистация
         </a>
       </div>

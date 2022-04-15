@@ -3,9 +3,10 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_admin import Admin, AdminIndexView, expose
 from data import db_session
 from data.users import User
+from data.olympiads import Olympiad
 from forms.user import RegisterForm, LoginForm
 from forms.profile_editing import ProfileForm
-from views import UserViews
+from views import UserViews, OlympiadsViews
 from flask_babelex import Babel
 
 
@@ -13,12 +14,13 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = '/static/image/profile'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
-
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'db/users.sqlite'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
+#db = SQLAlchemy(app)
 db_session.global_init("db/users.sqlite")
+
 babel = Babel(app)
 
 
@@ -45,9 +47,19 @@ class MyAdminIndexView(AdminIndexView):
 admin = Admin(app, index_view=MyAdminIndexView(), name='Подготовка к Техническому классу (админка)', template_mode='bootstrap4')
 '''
 
+class MyAdminIndexView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        if not current_user.is_authenticated:
+            return redirect('/login')
+        if current_user.admin != 'Администратор':
+            return redirect('/')
+        return super(MyAdminIndexView, self).index()
 
-admin = Admin(app, name='Кабинет Администратора', template_mode='bootstrap4')
+
+admin = Admin(app, index_view=MyAdminIndexView(), name='Кабинет Администратора', template_mode='bootstrap4', base_template='my_master.html')
 admin.add_view(UserViews(User, db_session.create_session(), name='Пользователи'))
+admin.add_view(OlympiadsViews(Olympiad, db_session.create_session(), name='Олимпиады'))
 
 
 @app.route('/')
@@ -80,12 +92,10 @@ def news():
 
 @app.get('/olympiads')
 def olympiads():
-    olympiads_list = [('Астрономия', '21-22 апреля', 'https://siriusolymp.ru/astronomy', 'astronomy.png'),
-                      ('Химия', '28-29 апреля', 'https://siriusolymp.ru/chemistry', 'chemistry.png'),
-                      ('Математика', '11-13 мая', 'https://siriusolymp.ru/mathematics', 'mathematics.png'),
-                      ('Физика', '16-17 мая', 'https://siriusolymp.ru/physics', 'physics.png'),
-                      ('Биология', '18-20 мая', 'https://siriusolymp.ru/biology', 'biology.png'),
-                      ('Информатика', '26-27 мая', 'https://siriusolymp.ru/informatics', 'informatics.png')]
+    db_sess = db_session.create_session()
+    olympiads_list = db_sess.query(Olympiad).all()
+    print(olympiads_list)
+
     return render_template('olympiads.html', title='Уголок Олимпиадника', olympiads=olympiads_list)
 
 

@@ -5,7 +5,7 @@ from flask import redirect, render_template
 from flask_admin import AdminIndexView
 
 
-class UserViews(ModelView):
+class BaseViews(ModelView):
     def _handle_view(self, name, **kwargs):
         if not self.is_accessible():
             return redirect('/')
@@ -15,6 +15,8 @@ class UserViews(ModelView):
                 current_user.is_authenticated and
                 current_user.admin == 'Администратор')
 
+
+class UserViews(BaseViews):
     can_export = True
     can_edit = True
     can_create = False
@@ -59,4 +61,52 @@ class UserViews(ModelView):
     edit_modal = True
 
 
+class OlympiadsViews(BaseViews):
+    can_export = True
+    can_edit = True
+    can_create = True
+    can_delete = True
+
+    column_display_pk = True
+    column_default_sort = ('type', False)
+
+    column_labels = {
+        'id': 'ID',
+        'type': 'Предмет',
+        'date': 'Дата проведения',
+        'image': 'Фото',
+        'href': 'Ссылка на регистрацию',
+    }
+    form_args = {
+        'type': dict(label='Предмет', validators=[DataRequired()]),
+        'date': dict(label='Дата проведения', validators=[DataRequired()]),
+        'image': dict(label='Фото', validators=[DataRequired(), Length(max=64, message='Длина вашего имени не должна превышать 64 символов')]),
+        'href': dict(label="Ссылка на регистрацию", validators=[Length(max=256, message='Длина описания не должна превышать 256 символов')])
+    }
+
+    AVAILABLE_USER_TYPES = [
+        (u'Астрономия', u'Астрономия'),
+        (u'Биология', u'Биология'),
+        (u'География', u'География'),
+        (u'Информатика', u'Информатика'),
+        (u'История', u'История'),
+        (u'Литература', u'Литература'),
+        (u'Математика', u'Математика'),
+        (u'Обществознание', u'Обществознание'),
+        (u'Право', u'Право'),
+        (u'Робототехника', u'Робототехника'),
+        (u'Русский язык', u'Русский язык'),
+        (u'Физика', u'Физика'),
+        (u'Физкультура', u'Физкультура'),
+        (u'Химия', u'Химия'),
+        (u'Экономика', u'Экономика'),
+    ]
+    form_choices = {
+        'type': AVAILABLE_USER_TYPES
+    }
+    column_searchable_list = ['date', 'type']
+    column_editable_list = ['date', 'type']  # быстрое изменение
+
+    create_modal = True
+    edit_modal = True
 
