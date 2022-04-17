@@ -42,11 +42,10 @@ def editing_avatar():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
     if request.method == 'POST':
-        my_file = open(f'static/image/profile/profile_{user.email.replace(".", "_")}.png', 'wb+')
+        my_file = open(f'profile1/static/image/profile_{user.email.replace(".", "_")}.png', 'wb+')
         my_file.write(request.files['file'].read())
         my_file.close()
-        user.avatar = f'/static/image/profile/profile_{user.email.replace(".", "_")}.png'
+        user.avatar = f'profile_{user.email.replace(".", "_")}.png'
         db_sess.commit()
         return redirect(url_for('.index'))
-    avatar = user.avatar
-    return render_template('profile/editing_avatar.html', avatar=avatar)
+    return render_template('profile/editing_avatar.html', avatar='static/image/' + user.avatar)
