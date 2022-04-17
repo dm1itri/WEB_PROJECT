@@ -1,8 +1,7 @@
 from flask_admin.contrib.sqla import ModelView
 from wtforms.validators import DataRequired, Length
 from flask_login import current_user
-from flask import redirect, render_template
-from flask_admin import AdminIndexView
+from flask import redirect
 
 
 class BaseViews(ModelView):
@@ -74,13 +73,11 @@ class OlympiadsViews(BaseViews):
         'id': 'ID',
         'type': 'Предмет',
         'date': 'Дата проведения',
-        'image': 'Фото',
         'href': 'Ссылка на регистрацию',
     }
     form_args = {
         'type': dict(label='Предмет', validators=[DataRequired()]),
         'date': dict(label='Дата проведения', validators=[DataRequired()]),
-        'image': dict(label='Фото', validators=[DataRequired(), Length(max=64, message='Длина вашего имени не должна превышать 64 символов')]),
         'href': dict(label="Ссылка на регистрацию", validators=[Length(max=256, message='Длина описания не должна превышать 256 символов')])
     }
 
@@ -92,10 +89,8 @@ class OlympiadsViews(BaseViews):
         (u'История', u'История'),
         (u'Литература', u'Литература'),
         (u'Математика', u'Математика'),
-        (u'Обществознание', u'Обществознание'),
         (u'Право', u'Право'),
         (u'Робототехника', u'Робототехника'),
-        (u'Русский язык', u'Русский язык'),
         (u'Физика', u'Физика'),
         (u'Физкультура', u'Физкультура'),
         (u'Химия', u'Химия'),

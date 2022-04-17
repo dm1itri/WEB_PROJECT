@@ -5,19 +5,19 @@
             <img src="/static/image/programing.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="500" height="500" loading="lazy">
       </div>
       <div class="col-lg-6">
-            {% if "python" in programming_lang %}
+            {% if "python" == programming_lang %}
                 <h1 class="display-5 fw-bold lh-1 mb-3">DAILY MOTIVATION BY <em>PYTHON</em> PROGRAMMER</h1>
                 <h2 class="primary" style="white-space: pre-wrap">def repeat():<br>    eat()<br>    sleep()<br>    respect_yourself()<br>    write_code()<br>    repeat()</h2>
-            {% elif "java" in programming_lang %}
+            {% elif "java" == programming_lang %}
                 <h1 class="display-5 fw-bold lh-1 mb-3">DAILY MOTIVATION BY <em>JAVA</em> PROGRAMMER</h1>
                 <h2 style="white-space: pre-wrap">public static void repeat() {<br>    eat();<br>    sleep();<br>    respect_yourself();<br>    write_code();<br>    repeat();<br>}</h2>
-            {% elif "c#" in programming_lang%}
+            {% elif "c_sharp" == programming_lang %}
                 <h1 class="display-5 fw-bold lh-1 mb-3">DAILY MOTIVATION BY <em>C#</em> PROGRAMMER</h1>
                 <h2 style="white-space: pre-wrap">public static void repeat() {<br>    eat();<br>    sleep();<br>    respect_yourself();<br>    write_code();<br>    repeat();<br>}</h2>
-            {% elif "javascript" in programming_lang %}
+            {% elif "javascript" == programming_lang %}
                 <h1 class="display-5 fw-bold lh-1 mb-3">DAILY MOTIVATION BY <em>JAVASCRIPT</em> PROGRAMMER</h1>
                 <h2 style="white-space: pre-wrap">function repeat() {<br>    eat();<br>    sleep();<br>    respect_yourself();<br>    write_code();<br>    repeat();<br>}</h2>
-            {% elif "swift" in programming_lang %}
+            {% elif "swift" == programming_lang %}
                 <h1 class="display-5 fw-bold lh-1 mb-3">DAILY MOTIVATION BY <em>SWIFT</em> PROGRAMMER</h1>
                 <h2 style="white-space: pre-wrap">func repeat() {<br>    eat()<br>    sleep()<br>    respect_yourself()<br>    write_code()<br>    repeat()<br>}</h2>
             {% else %}

@@ -1,51 +1,36 @@
 from flask import Flask, render_template, redirect, request, url_for, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_admin import Admin, AdminIndexView, expose
+from flask_babelex import Babel
+
 from data import db_session
 from data.users import User
 from data.olympiads import Olympiad
 from forms.user import RegisterForm, LoginForm
-from forms.profile_editing import ProfileForm
 from views import UserViews, OlympiadsViews
-from flask_babelex import Babel
-
+from profile1.routes import profile
+from random import choice
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-app.config['UPLOAD_FOLDER'] = '/static/image/profile'
+# app.config['UPLOAD_FOLDER'] = '/static/image/profile'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'db/users.sqlite'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-#db = SQLAlchemy(app)
 db_session.global_init("db/users.sqlite")
-
 babel = Babel(app)
+app.register_blueprint(profile)
 
 
 @babel.localeselector
 def get_locale():
     override = request.args.get('lang')
-
     if override:
         session['lang'] = override
-
     return session.get('lang', 'ru')
-'''
-class MyAdminIndexView(AdminIndexView):
 
-    @expose('/')
-    def index(self):
-        if not current_user.is_authenticated:
-            return redirect('/login')
-        if current_user.email not in ['d.ilin@gym.271.spb.ru']:
-            return redirect('/')
-        return super(MyAdminIndexView, self).index()
-
-
-admin = Admin(app, index_view=MyAdminIndexView(), name='Подготовка к Техническому классу (админка)', template_mode='bootstrap4')
-'''
 
 class MyAdminIndexView(AdminIndexView):
     @expose('/')
@@ -68,8 +53,10 @@ def main_page():
     button = True
     if current_user.__class__.__name__ != 'AnonymousUserMixin':
         db_sess = db_session.create_session()
-        lang = db_sess.query(User).filter(User.id == current_user.id).first().programming_languages.split(' ')[0]
+        lang = db_sess.query(User).filter(User.id == current_user.id).first().programming_languages.strip().split(' ')
+        lang = choice(lang)
         button = False
+    print(lang)
     return render_template('main.html', programming_lang=lang, button=button)
 
 
@@ -93,9 +80,8 @@ def news():
 @app.get('/olympiads')
 def olympiads():
     db_sess = db_session.create_session()
-    olympiads_list = db_sess.query(Olympiad).all()
-    print(olympiads_list)
-
+    olympiads_list = db_sess.query(Olympiad).order_by(Olympiad.type).all()
+    print(i for i in olympiads_list)
     return render_template('olympiads.html', title='Уголок Олимпиадника', olympiads=olympiads_list)
 
 
@@ -125,8 +111,6 @@ def tests_1(name):
     }
     name_pages = {
         'Какой_ЯП_твой': render_template('tests_1.html', title='Какой ЯП?', sp=args_pages[name]),
-        'обработка_данных': render_template('base.html', title='Обработка данных'),
-        'создание_исскуственного_интеллекта': render_template('base.html', title='Создание исскуственного интеллекта'),
         'софт_для_ПК': render_template('tests_1.html', title='Софт для ПК', sp=args_pages[name]),
         'веб_разработка': render_template('tests_1.html', title='Веб-Разработка', sp=args_pages[name]),
         'мобильные_приложения': render_template('tests_1.html', title='Мобильные приложения', sp=args_pages[name]),
@@ -165,15 +149,17 @@ def languages(name):
                'Язык C# практически универсален. Можно использовать его для создания любого ПО: продвинутых бизнес-приложений, видеоигр, функциональных веб-приложений, приложений для Windows, macOS, мобильных программ для iOS и Android.',
                     'c_sharp.png', ['https://stepik.org/course/99426/promo'])
     }
-    db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == current_user.id).first()
-    if request.method == 'POST':
-        if name in str(user.programming_languages):
-            user.programming_languages = user.programming_languages.replace(f'{name} ', '')
-        else:
-            user.programming_languages = user.programming_languages + name + ' '
-        db_sess.commit()
-    add_language = False if name in str(user.programming_languages) else True
+    add_language = None
+    if current_user.__class__.__name__ != 'AnonymousUserMixin':
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id).first()
+        if request.method == 'POST':
+            if name in str(user.programming_languages):
+                user.programming_languages = user.programming_languages.replace(f'{name} ', '')
+            else:
+                user.programming_languages = user.programming_languages + name + ' '
+            db_sess.commit()
+        add_language = False if name in str(user.programming_languages) else True
     return render_template('languages.html', title=name.replace('_', ' ').title(), language=name.replace('_', ' ').title(), about=args_pages[name][0], image=args_pages[name][1], add_language=add_language, link_1=args_pages[name][2][0])
 
 
@@ -224,56 +210,6 @@ def login():
             return redirect("/")
         return render_template('login.html', message="Неправильный логин или пароль", form=form)
     return render_template('login.html', title='Авторизация', form=form)
-
-
-@app.get('/profile')
-@login_required
-def profile():
-    db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == current_user.id).first()
-    languages = user.programming_languages[1:-1].split(' ') if user.programming_languages else False
-    return render_template('profile.html', title='Профиль', name=user.name, about=user.about, avatar=user.avatar, languages=languages, admin=user.admin)
-
-
-@app.route('/profile/editing', methods=['GET', 'POST'])
-@login_required
-def profile_editing():
-    db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == current_user.id).first()
-    form = ProfileForm()
-    if form.validate_on_submit():
-        data = request.form.to_dict()
-        if data['name']:
-            user.name = data['name']
-        if data['password']:
-            user.set_password(data['password'])
-        if data['about']:
-            user.about = data['about']
-        db_sess.commit()
-        return redirect('/profile')
-    return render_template('profile_editing.html', name=user.name, about=user.about, form=form, title='Редактирование профиля')
-
-
-@app.route('/profile/editing/avatar', methods=['GET', 'POST'])
-@login_required
-def profile_editing_avatar():
-    db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == current_user.id).first()
-    if request.method == 'POST':
-        my_file = open(f'static/image/profile/profile_{user.email.replace(".", "_")}.png', 'wb+')
-        my_file.write(request.files['file'].read())
-        my_file.close()
-        user.avatar = f'/static/image/profile/profile_{user.email.replace(".", "_")}.png'
-        db_sess.commit()
-        return redirect('/profile')
-    avatar = user.avatar
-    return render_template('profile_editing_avatar.html', avatar=avatar)
-
-
-@app.route('/admin_panel', methods=['GET', 'POST'])
-@login_required
-def admin_panel():
-    pass
 
 
 if __name__ == '__main__':

@@ -14,7 +14,7 @@ class User(SqlAlchemyBase, UserMixin):
     about = Column(String, nullable=True)
     email = Column(String, index=True, unique=True, nullable=True)
     hashed_password = Column(String, nullable=True)
-    avatar = Column(String, nullable=True, default='/static/image/profile/profile.png')
+    avatar = Column(String, nullable=True, default='profile.png')
     programming_languages = Column(String, default='')
     created_date = Column(DateTime, default=datetime.now)
     admin = Column(String, default='Пользователь', nullable=True)
