@@ -2,6 +2,8 @@ from flask_admin.contrib.sqla import ModelView
 from wtforms.validators import DataRequired, Length
 from flask_login import current_user
 from flask import redirect
+from flask_admin.model import typefmt
+from datetime import date
 
 
 class BaseViews(ModelView):
@@ -13,6 +15,10 @@ class BaseViews(ModelView):
         return (current_user.is_active and
                 current_user.is_authenticated and
                 current_user.admin == 'Администратор')
+
+
+def date_format(view, value):
+    return value.strftime('%Y-%m-%d %H:%M')
 
 
 class UserViews(BaseViews):
@@ -38,10 +44,10 @@ class UserViews(BaseViews):
     }
     form_args = {
         'email': dict(label='Почта', validators=[DataRequired()]),
-        'password': dict(label='Пароль', validators=[DataRequired(), Length(min=4, max=16,
-                                                                            message='Длина пароля должны быть от 4 до 16 символов')]),
-        'name': dict(label='Имя пользователя', validators=[DataRequired(), Length(max=64,
-                                                                                  message='Длина вашего имени не должна превышать 64 символов')]),
+        'password': dict(label='Пароль',
+                         validators=[DataRequired(), Length(min=4, max=16, message='Длина пароля должны быть от 4 до 16 символов')]),
+        'name': dict(label='Имя пользователя',
+                     validators=[DataRequired(), Length(max=64, message='Длина вашего имени не должна превышать 64 символов')]),
         'about': dict(label="Немного о себе", validators=[
             Length(max=256, message='Длина описания не должна превышать 256 символов')])
     }
@@ -58,6 +64,10 @@ class UserViews(BaseViews):
 
     create_modal = True
     edit_modal = True
+
+    MY_DEFAULT_FORMATTERS = dict(typefmt.BASE_FORMATTERS)
+    MY_DEFAULT_FORMATTERS.update({date: lambda view, date: date.strftime('%Y-%m-%d %H:%M')})
+    column_type_formatters = MY_DEFAULT_FORMATTERS
 
 
 class OlympiadsViews(BaseViews):
@@ -78,7 +88,8 @@ class OlympiadsViews(BaseViews):
     form_args = {
         'type': dict(label='Предмет', validators=[DataRequired()]),
         'date': dict(label='Дата проведения', validators=[DataRequired()]),
-        'href': dict(label="Ссылка на регистрацию", validators=[Length(max=256, message='Длина описания не должна превышать 256 символов')])
+        'href': dict(label="Ссылка на регистрацию",
+                     validators=[Length(max=256, message='Длина описания не должна превышать 256 символов')])
     }
 
     AVAILABLE_USER_TYPES = [
@@ -100,7 +111,7 @@ class OlympiadsViews(BaseViews):
         'type': AVAILABLE_USER_TYPES
     }
     column_searchable_list = ['date', 'type']
-    column_editable_list = ['date', 'type']  # быстрое изменение
+    # column_editable_list = ['date', 'type']  # быстрое изменение
 
     create_modal = True
     edit_modal = True

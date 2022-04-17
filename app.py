@@ -49,14 +49,14 @@ admin.add_view(OlympiadsViews(Olympiad, db_session.create_session(), name='Ол�
 
 @app.route('/')
 def main_page():
-    lang = ""
+    lang = ''
     button = True
     if current_user.__class__.__name__ != 'AnonymousUserMixin':
         db_sess = db_session.create_session()
         lang = db_sess.query(User).filter(User.id == current_user.id).first().programming_languages.strip().split(' ')
         lang = choice(lang)
         button = False
-    print(lang)
+
     return render_template('main.html', programming_lang=lang, button=button)
 
 
@@ -81,7 +81,6 @@ def news():
 def olympiads():
     db_sess = db_session.create_session()
     olympiads_list = db_sess.query(Olympiad).order_by(Olympiad.type).all()
-    print(i for i in olympiads_list)
     return render_template('olympiads.html', title='Уголок Олимпиадника', olympiads=olympiads_list)
 
 
