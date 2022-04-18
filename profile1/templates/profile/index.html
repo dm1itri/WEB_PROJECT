@@ -4,7 +4,7 @@
 
 <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
-        <img src="{{ avatar }}" class="d-block mx-lg-auto img-fluid" alt="Profile" width="500" height="500" loading="lazy">
+        <img src={{avatar}} class="d-block mx-lg-auto img-fluid" alt="Profile" width="500" height="500" loading="lazy">
       </div>
       <div class="col-lg-6">
         <h1 class="display-5 fw-bold lh-1 mb-3">{{name}}</h1>
@@ -28,7 +28,6 @@
             <li><a class="dropdown-item" href="/profile/editing/avatar">Аватар</a></li>
           </ul>
         </div>
-          
           {% if admin == 'Администратор'%}
           <br>
           <br>
@@ -36,6 +35,6 @@
           <a class="btn btn-warning" href="/admin">Панель Администратора</a>
           {% endif %}
       </div>
-    </div>
+</div>
 
 {% endblock %}

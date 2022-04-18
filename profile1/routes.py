@@ -14,7 +14,15 @@ def index():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
     languages = user.programming_languages[1:-1].split(' ') if user.programming_languages else False
-    return render_template('profile/index.html', title='Профиль', name=user.name, about=user.about, avatar='static/image/' + user.avatar, languages=languages, admin=user.admin)
+    args = {
+        'title': 'Профиль',
+        'name': user.name,
+        'about': user.about,
+        'avatar': 'static/image/' + user.avatar,
+        'languages': languages,
+        'admin': user.admin
+    }
+    return render_template('profile/index.html', **args)
 
 
 @profile.route('/editing', methods=['GET', 'POST'])
@@ -33,7 +41,13 @@ def editing():
             user.about = data['about']
         db_sess.commit()
         return redirect(url_for('.index'))
-    return render_template('profile/editing.html', name=user.name, about=user.about, form=form, title='Редактирование профиля')
+    args = {
+        'title': 'Редактирование профиля',
+        'name': user.name,
+        'about': user.about,
+        'form': form
+    }
+    return render_template('profile/editing.html', **args)
 
 
 @profile.route('/editing/avatar', methods=['GET', 'POST'])

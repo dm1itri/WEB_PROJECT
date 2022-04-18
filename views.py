@@ -43,13 +43,14 @@ class UserViews(BaseViews):
         'admin': 'Администратор'
     }
     form_args = {
-        'email': dict(label='Почта', validators=[DataRequired()]),
+        'email': dict(label='Почта',
+                      validators=[DataRequired()]),
         'password': dict(label='Пароль',
                          validators=[DataRequired(), Length(min=4, max=16, message='Длина пароля должны быть от 4 до 16 символов')]),
         'name': dict(label='Имя пользователя',
                      validators=[DataRequired(), Length(max=64, message='Длина вашего имени не должна превышать 64 символов')]),
-        'about': dict(label="Немного о себе", validators=[
-            Length(max=256, message='Длина описания не должна превышать 256 символов')])
+        'about': dict(label="Немного о себе",
+                      validators=[Length(max=256, message='Длина описания не должна превышать 256 символов')])
     }
 
     AVAILABLE_USER_TYPES = [
@@ -88,8 +89,7 @@ class OlympiadsViews(BaseViews):
     form_args = {
         'type': dict(label='Предмет', validators=[DataRequired()]),
         'date': dict(label='Дата проведения', validators=[DataRequired()]),
-        'href': dict(label="Ссылка на регистрацию",
-                     validators=[Length(max=256, message='Длина описания не должна превышать 256 символов')])
+        'href': dict(label="Ссылка на регистрацию", validators=[DataRequired()])
     }
 
     AVAILABLE_USER_TYPES = [
@@ -116,3 +116,30 @@ class OlympiadsViews(BaseViews):
     create_modal = True
     edit_modal = True
 
+
+class ProgrammingLanguagesViews(BaseViews):
+    can_export = True
+    can_edit = True
+    can_create = True
+    can_delete = True
+
+    column_display_pk = True
+    column_default_sort = ('name', False)
+
+    column_labels = {
+        'id': 'ID',
+        'name': 'Название ЯП',
+        'about': 'Описание',
+        'href': 'Ссылка на доп. ресурсы',
+    }
+    form_args = {
+        'name': dict(label='Название', validators=[DataRequired()]),
+        'about': dict(label='Описание', validators=[DataRequired()]),
+        'href': dict(label="Ссылка на доп. ресурсы", validators=[DataRequired()])
+    }
+
+    column_searchable_list = ['name']
+    # column_editable_list = ['date', 'type']  # быстрое изменение
+
+    create_modal = True
+    edit_modal = True

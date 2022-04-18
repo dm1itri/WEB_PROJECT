@@ -19,8 +19,6 @@ class User(SqlAlchemyBase, UserMixin):
     created_date = Column(DateTime, default=datetime.now)
     admin = Column(String, default='Пользователь', nullable=True)
 
-    #news = orm.relation("News", back_populates='user')
-
     def __repr__(self):
         return f'<User> {self.id} {self.name} {self.email}'
 

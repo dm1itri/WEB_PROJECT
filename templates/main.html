@@ -29,7 +29,21 @@
                 <a href="/register" type="button" class="btn btn-primary btn-lg px-4 me-md-2" style="color: #ffffff">Присоединиться</a>
               </div>
           {% endif %}
-
       </div>
+</div>
+<div class="container px-4 py-5" id="hanging-icons">
+    <h2 class="pb-2 border-bottom">Причины заниматься программированием</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+    {% for name, about in reasons %}
+
+            <div class="col d-flex align-items">
+                <div>
+                    <h2>{{ name }}</h2>
+                    <p>{{ about }}</p>
+                </div>
+            </div>
+
+    {% endfor %}
+    </div>
 </div>
 {% endblock %}
