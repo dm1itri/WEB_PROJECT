@@ -13,7 +13,7 @@ profile = Blueprint('profile', __name__, url_prefix='/profile', template_folder=
 def index():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
-    languages = user.programming_languages[1:-1].split(' ') if user.programming_languages else False
+    languages = user.programming_languages.strip().split(' ') if user.programming_languages.strip() else False
     args = {
         'title': 'Профиль',
         'name': user.name,
