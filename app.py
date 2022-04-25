@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, request, url_for, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_admin import Admin, AdminIndexView, expose
 from flask_babelex import Babel
+from flask_restful import Api
 
 from data import db_session
 from data.users import User
@@ -10,6 +11,7 @@ from data.programming_languages import ProgrammingLanguage
 from forms.user import RegisterForm, LoginForm
 from views import UserViews, OlympiadsViews, ProgrammingLanguagesViews
 from profile1.routes import profile
+from api.routes import ApiUser, ApiProgrammingLanguage, ApiOlympiads
 from random import choice
 
 app = Flask(__name__)
@@ -23,6 +25,11 @@ login_manager.init_app(app)
 db_session.global_init("db/users.sqlite")
 babel = Babel(app)
 app.register_blueprint(profile)
+api = Api(app)
+
+api.add_resource(ApiUser, '/api/user/<string:email>')
+api.add_resource(ApiProgrammingLanguage, '/api/language/<string:name>')
+api.add_resource(ApiOlympiads, '/api/olympiads/<string:type_olympiad>')
 
 
 @babel.localeselector
@@ -43,7 +50,7 @@ class MyAdminIndexView(AdminIndexView):
         return super(MyAdminIndexView, self).index()
 
 
-admin = Admin(app, index_view=MyAdminIndexView(), name='Кабинет Администратора', template_mode='bootstrap4', base_template='my_master.html')
+admin = Admin(app, index_view=MyAdminIndexView(), name='Кабинет Администратора', template_mode='bootstrap4', base_template='base_admin.html')
 admin.add_view(UserViews(User, db_session.create_session(), name='Пользователи'))
 admin.add_view(OlympiadsViews(Olympiad, db_session.create_session(), name='Олимпиады'))
 admin.add_view(ProgrammingLanguagesViews(ProgrammingLanguage, db_session.create_session(), name='Языки программирования'))
@@ -58,13 +65,9 @@ def main_page():
         lang = db_sess.query(User).filter(User.id == current_user.id).first().programming_languages.strip().split(' ')
         lang = choice(lang)
         button = False
-    reasons = [('Развивает логику и творческие способности', 'Что бы вы ни создавали: приложение, сайт или компьютерную игру – вы здорово тренируете свои творческие способности, прокачиваете свой интеллект и стимулируете выработку нужных нейросвязей в головном мозге. Так что, если вы начнете действовать прямо сейчас – наверняка раскроете скрытый потенциал своих умственных способностей.'),
-               ('Ваши старания окупятся', 'Чем большим количеством навыков вы овладели – тем больше будут стоить ваши услуги. Тут главное – относиться к обучению серьезно: не лениться и не пускать все на самотек. При должном усердии шанс устроиться на высокооплачиваемую работу и стать большим специалистом своего дела возрастает в разы. Конечно, первое время после окончания обучения, вам придется работать за еду, но по-другому не получится. Вы должны четко определить себе конечную цель и идти к ней, невзирая на сложности.'),
-               ('Научитесь экономить время себе и людям', 'Одна из важнейших способностей, которую вы получите, обучившись программированию – это навык решения задач. Ваш мозг будет четко справляться с любыми бытовыми проблемами, четко раскладывая их по полочкам. А с помощью грамотно написанных вами скриптов, вы сможете автоматизировать любой процесс, существенно сэкономив себе или клиенту важный ресурс – время.')]
     args = {
         'programming_lang': lang,
         'button': button,
-        'reasons': reasons
     }
     return render_template('main.html', **args)
 

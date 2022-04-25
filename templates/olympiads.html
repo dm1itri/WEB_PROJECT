@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+<div class="row">
     {% for olympiad in olympiads %}
-      <div class="feature col">
+      <div class="feature col col-md-12 col-lg-6 col-xl-4 mb-3" align="center">
         <img src="/static/image/olympiads/{{olympiad.type}}.png" alt="">
         <h2>{{olympiad.type}}</h2>
         <h4>{{olympiad.date}}</h4>
@@ -11,5 +11,5 @@
         </a>
       </div>
     {% endfor %}
-    </div>
+</div>
 {% endblock %}

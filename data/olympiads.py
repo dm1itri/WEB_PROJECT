@@ -1,8 +1,10 @@
 from sqlalchemy import Integer, Column, String, Boolean, DateTime
+from sqlalchemy_serializer import SerializerMixin
+
 from .db_session import SqlAlchemyBase
 
 
-class Olympiad(SqlAlchemyBase):
+class Olympiad(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'olympiads'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
