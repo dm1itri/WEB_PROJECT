@@ -50,7 +50,7 @@ class MyAdminIndexView(AdminIndexView):
         return super(MyAdminIndexView, self).index()
 
 
-admin = Admin(app, index_view=MyAdminIndexView(), name='Кабинет Администратора', template_mode='bootstrap4', base_template='base_admin.html')
+admin = Admin(app, index_view=MyAdminIndexView(), name='Кабинет Администратора', template_mode='bootstrap4', base_template='admin/base_admin.html')
 admin.add_view(UserViews(User, db_session.create_session(), name='Пользователи'))
 admin.add_view(OlympiadsViews(Olympiad, db_session.create_session(), name='Олимпиады'))
 admin.add_view(ProgrammingLanguagesViews(ProgrammingLanguage, db_session.create_session(), name='Языки программирования'))
@@ -66,6 +66,7 @@ def main_page():
         lang = choice(lang)
         button = False
     args = {
+        'title': 'Главная',
         'programming_lang': lang,
         'button': button,
     }
