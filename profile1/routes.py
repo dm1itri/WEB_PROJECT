@@ -62,4 +62,7 @@ def editing_avatar():
         user.avatar = f'profile_{user.email.replace(".", "_")}.png'
         db_sess.commit()
         return redirect(url_for('.index'))
-    return render_template('profile/editing_avatar.html', avatar='static/image/' + user.avatar)
+    args = {
+        'avatar': '/profile/static/image/' + user.avatar
+    }
+    return render_template('profile/editing_avatar.html', **args)

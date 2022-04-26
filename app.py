@@ -56,11 +56,21 @@ admin.add_view(OlympiadsViews(Olympiad, db_session.create_session(), name='Ол�
 admin.add_view(ProgrammingLanguagesViews(ProgrammingLanguage, db_session.create_session(), name='Языки программирования'))
 
 
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html', exception='Страница не найдена'), 404
+
+
+@app.errorhandler(500)
+def not_found_error(error):
+    return render_template('404.html', exception='Внутренняя ошибка сервера'), 500
+
+
 @app.route('/')
 def main_page():
     lang = ''
     button = True
-    if current_user.__class__.__name__ != 'AnonymousUserMixin':
+    if current_user.__class__.__name__ == 'User':
         db_sess = db_session.create_session()
         lang = db_sess.query(User).filter(User.id == current_user.id).first().programming_languages.strip().split(' ')
         lang = choice(lang)
@@ -122,7 +132,7 @@ def tests_1(name):
 def languages(name):
     add_language = None
     db_sess = db_session.create_session()
-    if current_user.__class__.__name__ != 'AnonymousUserMixin':
+    if current_user.__class__.__name__ == 'User':
         user = db_sess.query(User).filter(User.id == current_user.id).first()
         if request.method == 'POST':
             if name in str(user.programming_languages):
