@@ -70,7 +70,8 @@ def not_found_error(error):
 def main_page():
     lang = ''
     button = True
-    if current_user.__class__.__name__ == 'User':
+    print(current_user.is_authonticated)
+    if current_user.is_authenticated:
         db_sess = db_session.create_session()
         lang = db_sess.query(User).filter(User.id == current_user.id).first().programming_languages.strip().split(' ')
         lang = choice(lang)
@@ -132,7 +133,7 @@ def tests_1(name):
 def languages(name):
     add_language = None
     db_sess = db_session.create_session()
-    if current_user.__class__.__name__ == 'User':
+    if current_user.is_authenticated:
         user = db_sess.query(User).filter(User.id == current_user.id).first()
         if request.method == 'POST':
             if name in str(user.programming_languages):
