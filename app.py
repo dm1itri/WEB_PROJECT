@@ -207,12 +207,12 @@ def languages(name):
     if current_user.is_authenticated:
         user = db_sess.query(User).filter(User.id == current_user.id).first()
         if request.method == 'POST':
-            if name in str(user.programming_languages):
+            if name in user.programming_languages.strip().split(' '):
                 user.programming_languages = user.programming_languages.replace(f'{name} ', '')
             else:
                 user.programming_languages = user.programming_languages + name + ' '
             db_sess.commit()
-        add_language = False if name in str(user.programming_languages) else True
+        add_language = False if name in user.programming_languages.strip().split(' ') else True
     lang_arg = db_sess.query(ProgrammingLanguage).filter(ProgrammingLanguage.name == name).first()
     args = {
         'title': name.replace('_', ' ').title(),
