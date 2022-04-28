@@ -139,7 +139,7 @@ def tests_1(name):
     return name_pages[name]
 
 
-@app.get('/tests/2/<name>')
+@app.route('/tests/2/<name>')
 def tests_2(name):
     args_pages = {
         'Выберите_формат_обучения': [
@@ -170,7 +170,7 @@ def tests_2(name):
     return name_pages[name]
 
 
-@app.get('/education/<name>')
+@app.route('/education/<name>')
 def education(name):
     args_page = {
         'заочно-c_наставником': ('Отличный вариант обучения для человека, который не хочет тратить '
