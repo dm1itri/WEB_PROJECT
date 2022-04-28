@@ -1,13 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-  <a href="/tests/1/Какой_ЯП_твой?">
-    <div class="card card-center text-center" style="width: 18rem;">
-      <img src="static/image/coding_language.png" class="card-img-top" alt="ОЙ">
-      <div class="card-body">
-        <p class="card-text">Какой язык программирования выбрать?</p>
+<div class="row">
+  <div class="feature col col-md-12 col-lg-6 col-xl-4 mb-3">
+    <a href="/tests/1/Какой_ЯП_твой?">
+      <div class="card card-center text-center" style="width: 18rem;">
+        <img src="static/image/coding_language.png" class="card-img-top" alt="ОЙ">
+        <div class="card-body">
+          <p class="card-text">Какой язык программирования выбрать?</p>
+        </div>
       </div>
-    </div>
-  </a>
+    </a>
+  </div>
+  <div class="feature col col-md-12 col-lg-6 col-xl-4 mb-3">
+    <a href="/tests/2/Выберите_формат_обучения">
+      <div class="card card-center text-center" style="width: 18rem;">
+        <img src="static/image/tests_2/tests_2.png" class="card-img-top" alt="ОЙ">
+        <div class="card-body">
+          <p class="card-text">Какой формат обучения подойдет именно тебе?</p>
+        </div>
+      </div>
+    </a>
+  </div>
 </div>
 {% endblock %}

@@ -50,10 +50,12 @@ class MyAdminIndexView(AdminIndexView):
         return super(MyAdminIndexView, self).index()
 
 
-admin = Admin(app, index_view=MyAdminIndexView(), name='Кабинет Администратора', template_mode='bootstrap4', base_template='admin/base_admin.html')
+admin = Admin(app, index_view=MyAdminIndexView(), name='Кабинет Администратора',
+              template_mode='bootstrap4', base_template='admin/base_admin.html')
 admin.add_view(UserViews(User, db_session.create_session(), name='Пользователи'))
 admin.add_view(OlympiadsViews(Olympiad, db_session.create_session(), name='Олимпиады'))
-admin.add_view(ProgrammingLanguagesViews(ProgrammingLanguage, db_session.create_session(), name='Языки программирования'))
+admin.add_view(ProgrammingLanguagesViews(ProgrammingLanguage, db_session.create_session(),
+                                         name='Языки программирования'))
 
 
 @app.errorhandler(404)
@@ -70,10 +72,10 @@ def not_found_error(error):
 def main_page():
     lang = ''
     button = True
-    print(current_user.is_authonticated)
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
-        lang = db_sess.query(User).filter(User.id == current_user.id).first().programming_languages.strip().split(' ')
+        lang = db_sess.query(User).filter(
+            User.id == current_user.id).first().programming_languages.strip().split(' ')
         lang = choice(lang)
         button = False
     args = {
@@ -102,31 +104,100 @@ def tests():
 
 @app.get('/tests/1/<name>')
 def tests_1(name):
+    '''Можно было и объединить функции test_1 и tests_2 так, как у них одинаковый функционал,
+    но для понимания, что к чему тносится разделил'''
     args_pages = {
         'Какой_ЯП_твой': [('/languages/python', 'обработка_данных.png', 'Обработка данных'),
-                          ('/languages/python', 'создание_искусственного_интеллекта.png', 'Создание исскуственного интеллекта'),
+                          ('/languages/python', 'создание_искусственного_интеллекта.png',
+                           'Создание исскуственного интеллекта'),
                           ('/tests/1/софт_для_ПК', 'софт_для_ПК.png', 'Софт для ПК'),
                           ('/tests/1/веб_разработка', 'веб_разработка.png', 'Веб-разработка'),
-                          ('/tests/1/мобильные_приложения', 'мобильные_приложения.png', 'Мобильные приложения'),
+                          ('/tests/1/мобильные_приложения', 'мобильные_приложения.png',
+                           'Мобильные приложения'),
                           ('/tests/1/разработка_игр', 'разработка_игр.png', 'Разработка игр')],
         'софт_для_ПК': [('/languages/java', 'все_платформы.png', 'Все платформы'),
                         ('/languages/c_sharp', 'windows.png', 'Windows'),
                         ('/languages/swift', 'mac.png', 'Mac')],
-        'веб_разработка':  [('/languages/javascript', 'внешний_вид_сайта.png', 'Внешний вид сайта'),
-                            ('/languages/python', 'работа_с_сервером.png', 'Работа с сервером')],  # при работе с сервером можно ещё и учитывать масштаб проекта
+        'веб_разработка': [('/languages/javascript', 'внешний_вид_сайта.png', 'Внешний вид сайта'),
+                           ('/languages/python', 'работа_с_сервером.png', 'Работа с сервером')],
+        # при работе с сервером можно ещё и учитывать масштаб проекта
         'мобильные_приложения': [('/languages/swift', 'ios.png', 'IOS'),
                                  ('/languages/java', 'андроид.png', 'Андроид')],
         'разработка_игр': [('/languages/c_sharp', 'небольшие_игры.png', 'Небольшие проекты'),
-                                 ('/languages/c++', 'крупные_игры.png', 'Крупные проекты')]
+                           ('/languages/c++', 'крупные_игры.png', 'Крупные проекты')]
     }
     name_pages = {
         'Какой_ЯП_твой': render_template('tests_1.html', title='Какой ЯП?', sp=args_pages[name]),
         'софт_для_ПК': render_template('tests_1.html', title='Софт для ПК', sp=args_pages[name]),
-        'веб_разработка': render_template('tests_1.html', title='Веб-Разработка', sp=args_pages[name]),
-        'мобильные_приложения': render_template('tests_1.html', title='Мобильные приложения', sp=args_pages[name]),
-        'разработка_игр': render_template('tests_1.html', title='Разработка игр', sp=args_pages[name])
+        'веб_разработка': render_template('tests_1.html', title='Веб-Разработка',
+                                          sp=args_pages[name]),
+        'мобильные_приложения': render_template('tests_1.html', title='Мобильные приложения',
+                                                sp=args_pages[name]),
+        'разработка_игр': render_template('tests_1.html', title='Разработка игр',
+                                          sp=args_pages[name])
     }
     return name_pages[name]
+
+
+@app.get('/tests/2/<name>')
+def tests_2(name):
+    args_pages = {
+        'Выберите_формат_обучения': [
+            ('/tests/2/Как_хорошо_знакомы_с_программированием?', 'tests_2/самостоятельный.png',
+             'Самостоятельный'),
+            ('/tests/2/Хочешь_быть_привязнным_ко_времени_и_месту?',
+             'tests_2/с_наставником.png', 'С наставником')],
+        'Как_хорошо_знакомы_с_программированием': [
+            ('/education/самостоятельно-новичок', 'tests_2/новичок.png', 'Новичок'),
+            ('/education/самостоятельно-профессионал', 'tests_2/опытный.png', 'Опытный')],
+        'Хочешь_быть_привязнным_ко_времени_и_месту': [
+            ('/education/очно-с_наставником', 'tests_2/конечно.png',
+             'Привязанность ко времени и месту'),
+            ('/education/заочно-c_наставником', 'tests_2/нет.png',
+             'Обучение при помощи средств дистанционной связи')]
+    }
+    name_pages = {
+        'Выберите_формат_обучения': render_template('tests_1.html',
+                                                    title='Какой формат обучения?',
+                                                    sp=args_pages[name]),
+        'Как_хорошо_знакомы_с_программированием': render_template('tests_1.html',
+                                                                  title='Уровень программирования',
+                                                                  sp=args_pages[name]),
+        'Хочешь_быть_привязнным_ко_времени_и_месту': render_template('tests_1.html',
+                                                                     title='Привязанность к месту',
+                                                                     sp=args_pages[name]),
+    }
+    return name_pages[name]
+
+
+@app.get('/education/<name>')
+def education(name):
+    args_page = {
+        'заочно-c_наставником': ('Отличный вариант обучения для человека, который не хочет тратить '
+                                 'время на дорогу. Но очень важно во время дистанцинного занаятия не'
+                                 ' отвлекаться на посторонние вещи, то для многих является трудностью',
+                                 'tests_2/нет.png'),
+        'очно-с_наставником': ('Большими плюсами данного способа является вовлеченность в жизнь '
+                               'коллектива, а также четкий контроль со стороны педагога',
+                               'tests_2/конечно.png'),
+        'самостоятельно-новичок': ('Самый трудный вариант для большинства людей. При обучении '
+                                   'придется всю информацию подбирать и структурировать самостоятельно.'
+                                   ' Очень важно контролировать время уделяемое на обучение.'
+                                   ' Получается, что это как минусы, так и плюсы.',
+                                   'tests_2/новичок.png'),
+        'самостоятельно-профессионал': ('При понимании большинства механизмов и знания '
+                                        'программирования лучшим способом будет самостоятельное '
+                                        'изучение официальной документации на определенные библиотеки',
+                                        'tests_2/опытный.png'),
+    }
+    args = {
+        'title': name.replace('_', ' ').replace('-', ' ').title(),
+        'language': name.replace('-', '\n').title().replace('_', ' '),
+        'about': args_page[name][0],
+        'image': args_page[name][1],
+        'add_language': None,
+    }
+    return render_template('languages.html', **args)
 
 
 @app.route('/languages/<name>', methods=['GET', 'POST'])
@@ -213,5 +284,4 @@ def login():
 
 
 if __name__ == '__main__':
-
     app.run(port=8080, host='127.0.0.1')
