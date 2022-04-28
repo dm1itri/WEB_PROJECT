@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 from data import db_session
 from data.users import User
 from forms.profile_editing import ProfileForm
-import os
 
 profile = Blueprint('profile', __name__, url_prefix='/profile', template_folder='templates', static_folder='static')
 
@@ -56,7 +55,6 @@ def editing_avatar():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
     if request.method == 'POST':
-        print(os.path.abspath('profile1/static/image/profile_{user.email.replace(".", "_").replace("@", "__")}.png'))
         with open(f'profile1/static/image/profile_{user.email.replace(".", "_").replace("@", "__")}.png', 'wb+') as f:
             f.write(request.files['file'].read())
         user.avatar = f'profile_{user.email.replace(".", "_").replace("@", "__")}.png'
