@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from data import db_session
 from data.users import User
 from forms.profile_editing import ProfileForm
-
+import os
 
 profile = Blueprint('profile', __name__, url_prefix='/profile', template_folder='templates', static_folder='static')
 
@@ -18,7 +18,7 @@ def index():
         'title': 'Профиль',
         'name': user.name,
         'about': user.about,
-        'avatar': 'static/image/' + user.avatar,
+        'avatar': url_for('.static', filename='image/' + user.avatar),
         'languages': languages,
         'admin': user.admin
     }
@@ -56,13 +56,14 @@ def editing_avatar():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
     if request.method == 'POST':
-        my_file = open(f'profile1/static/image/profile_{user.email.replace(".", "_")}.png', 'wb+')
-        my_file.write(request.files['file'].read())
-        my_file.close()
-        user.avatar = f'profile_{user.email.replace(".", "_")}.png'
+        print(os.path.abspath('profile1/static/image/profile_{user.email.replace(".", "_").replace("@", "__")}.png'))
+        with open(f'profile1/static/image/profile_{user.email.replace(".", "_").replace("@", "__")}.png', 'wb+') as f:
+            f.write(request.files['file'].read())
+        user.avatar = f'profile_{user.email.replace(".", "_").replace("@", "__")}.png'
         db_sess.commit()
         return redirect(url_for('.index'))
     args = {
-        'avatar': '/profile/static/image/' + user.avatar
+        'avatar': url_for('.static', filename='image/' + user.avatar)
     }
+    print(args['avatar'])
     return render_template('profile/editing_avatar.html', **args)
