@@ -5,7 +5,7 @@
 - Flask-Admin
 - Flask-Login
 - Flask-WTF
-- Flask-BabelEx  
+- Flask-BabelEx    
 Управление базой данных:
 - SCLAlchemy 
 Проект можно просмотреть по адресу:  
